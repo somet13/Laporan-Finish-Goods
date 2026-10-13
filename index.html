@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FG Report System - CONCORD</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo"><img src="concord-logo.png" alt="CONCORD" /></div>
+        <div><h1>FG REPORT</h1><p>Keramik System</p></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="dashboard">📊 <span>Dashboard</span></button>
+        <button class="nav-item" data-section="packing">📦 <span>Packing / QC</span></button>
+        <button class="nav-item" data-section="warehouse">🏭 <span>Warehouse</span></button>
+        <button class="nav-item" data-section="admin">📋 <span>Admin</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span>Staff Finish Goods</span>
+        <small>FG Report System</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="content-section active">
+
+        <div class="page-header dashboard-header">
+          <div>
+            <span class="eyebrow">FINISH GOODS MONITORING</span>
+            <h2>Dashboard Produksi</h2>
+            <p>Monitoring produksi keramik berdasarkan tanggal, kualitas, dan total Finish Goods.</p>
+          </div>
+
+          <div class="today-box">
+            <span>Hari ini</span>
+            <strong id="dashboardDate">-</strong>
+          </div>
+        </div>
+
+        <div class="panel dashboard-filter">
+          <div>
+            <strong>Periode Grafik</strong>
+            <small>Pilih rentang tanggal produksi.</small>
+          </div>
+
+          <div class="filter-controls">
+            <label>
+              Dari
+              <input type="date" id="dashboardStartDate" />
+            </label>
+
+            <label>
+              Sampai
+              <input type="date" id="dashboardEndDate" />
+            </label>
+
+            <button class="btn primary" id="applyDashboardBtn">
+              Tampilkan
+            </button>
+
+            <button class="btn secondary" id="resetDashboardBtn">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-stat-grid">
+
+          <div class="dashboard-stat-card">
+            <div class="stat-icon green">🏭</div>
+            <div>
+              <span>Total Master</span>
+              <strong id="dashboardMaster">0</strong>
+              <small>Warehouse</small>
+            </div>
+          </div>
+
+          <div class="dashboard-stat-card">
+            <div class="stat-icon teal">S1</div>
+            <div>
+              <span>Total S1</span>
+              <strong id="dashboardS1">0</strong>
+              <small>Box</small>
+            </div>
+          </div>
+
+          <div class="dashboard-stat-card">
+            <div class="stat-icon yellow">S2</div>
+            <div>
+              <span>Total S2</span>
+              <strong id="dashboardS2">0</strong>
+              <small>Box</small>
+            </div>
+          </div>
+
+          <div class="dashboard-stat-card">
+            <div class="stat-icon red">KW3</div>
+            <div>
+              <span>Total KW3</span>
+              <strong id="dashboardKW3">0</strong>
+              <small>Box</small>
+            </div>
+          </div>
+
+          <div class="dashboard-stat-card total">
+            <div class="stat-icon dark">Σ</div>
+            <div>
+              <span>Grand Total</span>
+              <strong id="dashboardTotal">0</strong>
+              <small>Box</small>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-chart-grid">
+
+          <div class="panel">
+
+            <div class="chart-header">
+              <div>
+                <h3>Grafik Produksi Harian</h3>
+                <p>S1, S2, dan KW3 berdasarkan tanggal.</p>
+              </div>
+
+              <span class="live-badge">
+                LIVE DATA
+              </span>
+            </div>
+
+            <div class="chart-wrap large">
+              <canvas id="productionChart"></canvas>
+            </div>
+
+          </div>
+
+          <div class="panel">
+
+            <div class="chart-header">
+              <div>
+                <h3>Komposisi Kualitas</h3>
+                <p>Komposisi pada periode terpilih.</p>
+              </div>
+            </div>
+
+            <div class="chart-wrap doughnut">
+              <canvas id="qualityChart"></canvas>
+            </div>
+
+            <div id="qualitySummary" class="quality-summary"></div>
+
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="chart-header">
+            <div>
+              <h3>Ringkasan Produksi Harian</h3>
+              <p>Total produksi setiap tanggal.</p>
+            </div>
+          </div>
+
+          <div id="dailySummaryGrid" class="daily-summary-grid"></div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <h3>Kapasitas Ukuran Keramik</h3>
+            <p>Warna dipakai konsisten di seluruh laporan.</p>
+          </div>
+
+          <div id="dashboardLegend" class="size-legend"></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- WAREHOUSE -->
+      <section id="warehouse" class="content-section">
+
+        <div class="page-header">
+          <div>
+            <h2>Warehouse Master</h2>
+            <p>Data master Finish Goods per shift, dikelompokkan berdasarkan ukuran.</p>
+          </div>
+
+          <button class="btn primary" id="addWarehouseBtn">
+            + Tambah Master
+          </button>
+        </div>
+
+        <div class="stat-grid">
+
+          <div class="stat-card">
+            <span>Total Master</span>
+            <strong id="warehouseCount">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Total S1</span>
+            <strong id="warehouseS1">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Total S2</span>
+            <strong id="warehouseS2">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Total KW3</span>
+            <strong id="warehouseKW3">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Grand Total</span>
+            <strong id="warehouseTotal">0</strong>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="table-toolbar">
+
+            <div>
+              <h3>Master Finish Goods</h3>
+              <small>
+                Urutan: Ukuran → Merek A-Z → Kode → Motif → Seri → Shift
+              </small>
+            </div>
+
+            <input
+              class="search"
+              id="warehouseSearch"
+              placeholder="Cari master..."
+            />
+
+          </div>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>No</th>
+                  <th>Tanggal</th>
+                  <th>No SPPJ</th>
+                  <th>Merek</th>
+                  <th>Motif</th>
+                  <th>Kode Produksi</th>
+                  <th>Seri</th>
+                  <th>Ukuran</th>
+                  <th>Shift</th>
+                  <th>S1</th>
+                  <th>S2</th>
+                  <th>KW3</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Tgl Input</th>
+                  <th>Aksi</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="warehouseTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PACKING/QC -->
+      <section id="packing" class="content-section">
+
+        <div class="page-header">
+          <div>
+            <h2>Packing / QC</h2>
+            <p>Data Packing membaca Master Warehouse secara langsung.</p>
+          </div>
+
+          <button class="btn primary" id="addPackingBtn">
+            + Tambah Packing
+          </button>
+        </div>
+
+        <div class="stat-grid">
+
+          <div class="stat-card">
+            <span>Total Packing</span>
+            <strong id="packingCount">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Total Box</span>
+            <strong id="packingTotal">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>OK</span>
+            <strong id="packingOK">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>REWORK</span>
+            <strong id="packingRework">0</strong>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="table-toolbar">
+
+            <div>
+              <h3>Data Packing / QC</h3>
+              <small>
+                Urutan: Ukuran → Merek A-Z → Kode → Motif → Seri
+              </small>
+            </div>
+
+            <input
+              class="search"
+              id="packingSearch"
+              placeholder="Cari data..."
+            />
+
+          </div>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>No</th>
+                  <th>Tgl Produksi</th>
+                  <th>Merek</th>
+                  <th>Motif</th>
+                  <th>Kode Produksi</th>
+                  <th>Seri</th>
+                  <th>Ukuran</th>
+                  <th>S1</th>
+                  <th>S2</th>
+                  <th>KW3</th>
+                  <th>Total</th>
+                  <th>Keterangan</th>
+                  <th>Tgl Input</th>
+                  <th>Shift</th>
+                  <th>Aksi</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="packingTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ADMIN -->
+      <section id="admin" class="content-section">
+
+        <div class="page-header">
+
+          <div>
+            <h2>Admin - Laporan Harian</h2>
+            <p>
+              Data master yang sama pada tanggal yang sama
+              digabung tanpa membedakan shift.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="panel admin-filter">
+
+          <div>
+
+            <label>
+              Tanggal Laporan
+              <input type="date" id="adminTanggal" />
+            </label>
+
+          </div>
+
+          <div class="filter-actions">
+
+            <button
+              class="btn primary"
+              id="generateAdminBtn"
+            >
+              Generate / Refresh Rekap
+            </button>
+
+            <button
+              class="btn secondary"
+              id="exportAdminBtn"
+            >
+              📊 Export Excel
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="info-box">
+
+          <strong>Penggabungan:</strong>
+
+          <span>
+            Tanggal + Merek + Kode Produksi + Motif + Seri + Ukuran.
+          </span>
+
+          <span>
+            Shift tidak menjadi pembeda.
+          </span>
+
+        </div>
+
+        <div class="stat-grid">
+
+          <div class="stat-card">
+            <span>Total Kelompok</span>
+            <strong id="adminGroupCount">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>S1</span>
+            <strong id="adminS1">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>S2</span>
+            <strong id="adminS2">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>KW3</span>
+            <strong id="adminKW3">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Grand Total</span>
+            <strong id="adminTotal">0</strong>
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="table-toolbar">
+
+            <div>
+              <h3>Rekap Laporan Harian</h3>
+              <small>
+                Urutan: Ukuran → Merek A-Z → Kode → Motif → Seri
+              </small>
+            </div>
+
+            <input
+              class="search"
+              id="adminSearch"
+              placeholder="Cari laporan..."
+            />
+
+          </div>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>No</th>
+                  <th>Tanggal</th>
+                  <th>Kode Produksi</th>
+                  <th>Motif</th>
+                  <th>Merek</th>
+                  <th>Seri</th>
+                  <th>Ukuran</th>
+                  <th>S1</th>
+                  <th>S2</th>
+                  <th>KW3</th>
+                  <th>Total</th>
+                  <th>Aksi</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="adminTableBody"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       WAREHOUSE MODAL
+  ====================================================== -->
+
+  <div class="modal" id="warehouseModal">
+
+    <div class="modal-card large">
+
+      <div class="modal-head">
+
+        <div>
+          <h3 id="warehouseModalTitle">
+            Tambah Master Warehouse
+          </h3>
+
+          <p>
+            Isi data produksi dan rincian kualitas.
+          </p>
+        </div>
+
+        <button
+          class="modal-close"
+          data-close="warehouseModal"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <form id="warehouseForm">
+
+        <input
+          type="hidden"
+          id="warehouseId"
+        />
+
+        <div class="form-grid">
+
+          <label>
+            Tanggal Produksi
+            <input
+              type="date"
+              id="warehouseTanggal"
+              required
+            />
+          </label>
+
+          <label>
+            No SPPJ
+            <input
+              type="text"
+              id="warehouseSPPJ"
+              required
+            />
+          </label>
+
+          <label>
+            Merek
+            <input
+              type="text"
+              id="warehouseMerek"
+              required
+            />
+          </label>
+
+          <label>
+            Motif
+            <input
+              type="text"
+              id="warehouseMotif"
+              required
+            />
+          </label>
+
+          <label>
+            Kode Produksi
+            <input
+              type="text"
+              id="warehouseKodeProduksi"
+              required
+            />
+          </label>
+
+          <label>
+            Seri
+            <input
+              type="text"
+              id="warehouseSeri"
+              placeholder="Contoh: 54"
+              required
+            />
+          </label>
+
+          <label>
+            Ukuran
+
+            <select
+              id="warehouseUkuran"
+              required
+            >
+
+              <option value="">
+                Pilih ukuran
+              </option>
+
+              <option value="25x50">
+                25 x 50
+              </option>
+
+              <option value="50x50">
+                50 x 50
+              </option>
+
+              <option value="60x60">
+                60 x 60
+              </option>
+
+              <option value="60x120">
+                60 x 120
+              </option>
+
+            </select>
+
+          </label>
+
+          <label>
+            Shift
+
+            <select
+              id="warehouseShift"
+              required
+            >
+
+              <option value="">
+                Pilih shift
+              </option>
+
+              <option>
+                SHIFT 1
+              </option>
+
+              <option>
+                SHIFT 2
+              </option>
+
+              <option>
+                SHIFT 3
+              </option>
+
+            </select>
+
+          </label>
+
+          <label>
+            Status
+
+            <select
+              id="warehouseStatus"
+            >
+
+              <option>
+                SESUAI
+              </option>
+
+              <option>
+                TIDAK SESUAI
+              </option>
+
+            </select>
+
+          </label>
+
+          <label>
+            Tanggal Input
+
+            <input
+              type="date"
+              id="warehouseTanggalInput"
+              required
+            />
+
+          </label>
+
+        </div>
+
+
+        <h4 class="section-title">
+          Rincian Finish Goods
+        </h4>
+
+
+        <div class="quality-grid">
+
+
+          <!-- S1 -->
+
+          <div class="quality-card">
+
+            <h4>
+              S1
+            </h4>
+
+            <label>
+              Palet
+
+              <input
+                type="number"
+                id="s1Palet"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <label>
+              Rimpilan
+
+              <input
+                type="number"
+                id="s1Rimpilan"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <small>
+              Box/Palet:
+              <b id="s1BoxPerPalet">
+                0
+              </b>
+            </small>
+
+            <div class="quality-total">
+              Total S1
+              <b id="s1Total">
+                0
+              </b>
+            </div>
+
+          </div>
+
+
+          <!-- S2 -->
+
+          <div class="quality-card">
+
+            <h4>
+              S2
+            </h4>
+
+            <label>
+              Palet
+
+              <input
+                type="number"
+                id="s2Palet"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <label>
+              Rimpilan
+
+              <input
+                type="number"
+                id="s2Rimpilan"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <small>
+              Box/Palet:
+              <b id="s2BoxPerPalet">
+                0
+              </b>
+            </small>
+
+            <div class="quality-total">
+              Total S2
+              <b id="s2Total">
+                0
+              </b>
+            </div>
+
+          </div>
+
+
+          <!-- KW3 -->
+
+          <div class="quality-card">
+
+            <h4>
+              KW3
+            </h4>
+
+            <label>
+              Palet
+
+              <input
+                type="number"
+                id="kw3Palet"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <label>
+              Rimpilan
+
+              <input
+                type="number"
+                id="kw3Rimpilan"
+                min="0"
+                value="0"
+              />
+
+            </label>
+
+            <small>
+              Box/Palet:
+              <b id="kw3BoxPerPalet">
+                0
+              </b>
+            </small>
+
+            <div class="quality-total">
+              Total KW3
+              <b id="kw3Total">
+                0
+              </b>
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+        <div class="grand-total">
+
+          <span>
+            GRAND TOTAL
+          </span>
+
+          <strong id="warehouseGrandTotal">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            data-close="warehouseModal"
+          >
+            Batal
+          </button>
+
+          <button
+            class="btn primary"
+          >
+            Simpan Master
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       PACKING MODAL
+  ====================================================== -->
+
+  <div class="modal" id="packingModal">
+
+    <div class="modal-card large">
+
+      <div class="modal-head">
+
+        <div>
+
+          <h3 id="packingModalTitle">
+            Tambah Packing / QC
+          </h3>
+
+          <p>
+            Data mengikuti Master Warehouse.
+          </p>
+
+        </div>
+
+        <button
+          class="modal-close"
+          data-close="packingModal"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="packingForm">
+
+        <input
+          type="hidden"
+          id="packingId"
+        />
+
+
+        <div class="form-grid">
+
+
+          <label class="full">
+
+            Pilih Master Warehouse
+
+            <select
+              id="packingMasterId"
+              required
+            ></select>
+
+          </label>
+
+
+          <label>
+
+            Tanggal Produksi
+
+            <input
+              type="date"
+              id="packingTanggalProduksi"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Merek
+
+            <input
+              type="text"
+              id="packingMerek"
+              readonly
+            />
+
+          </label>
+
+
+          <label>
+
+            Motif
+
+            <input
+              type="text"
+              id="packingMotif"
+              readonly
+            />
+
+          </label>
+
+
+          <label>
+
+            Kode Produksi
+
+            <input
+              type="text"
+              id="packingKodeProduksi"
+              readonly
+            />
+
+          </label>
+
+
+          <label>
+
+            Seri
+
+            <input
+              type="text"
+              id="packingSeri"
+              readonly
+            />
+
+          </label>
+
+
+          <label>
+
+            Ukuran
+
+            <input
+              type="text"
+              id="packingUkuran"
+              readonly
+            />
+
+          </label>
+
+
+        </div>
+
+
+        <div class="packing-preview">
+
+
+          <div>
+
+            <span>
+              S1
+            </span>
+
+            <b id="packingS1">
+              0
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              S2
+            </span>
+
+            <b id="packingS2">
+              0
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              KW3
+            </span>
+
+            <b id="packingKW3">
+              0
+            </b>
+
+          </div>
+
+
+          <div class="grand-preview">
+
+            <span>
+              TOTAL
+            </span>
+
+            <b id="packingJumlah">
+              0
+            </b>
+
+          </div>
+
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <label>
+
+            Keterangan
+
+            <select
+              id="packingKeterangan"
+            >
+
+              <option>
+                OK
+              </option>
+
+              <option>
+                REWORK
+              </option>
+
+              <option>
+                REJECT
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            Tanggal Input
+
+            <input
+              type="date"
+              id="packingTanggalInput"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Shift Input
+
+            <select
+              id="packingShift"
+              required
+            >
+
+              <option value="">
+                Pilih shift
+              </option>
+
+              <option>
+                SHIFT 1
+              </option>
+
+              <option>
+                SHIFT 2
+              </option>
+
+              <option>
+                SHIFT 3
+              </option>
+
+            </select>
+
+          </label>
+
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            data-close="packingModal"
+          >
+            Batal
+          </button>
+
+          <button
+            class="btn primary"
+          >
+            Simpan Packing
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ADMIN MODAL
+  ====================================================== -->
+
+  <div class="modal" id="adminModal">
+
+    <div class="modal-card">
+
+      <div class="modal-head">
+
+        <div>
+
+          <h3>
+            Edit Laporan Admin
+          </h3>
+
+          <p>
+            Admin dapat melakukan revisi manual.
+          </p>
+
+        </div>
+
+        <button
+          class="modal-close"
+          data-close="adminModal"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="adminForm">
+
+        <input
+          type="hidden"
+          id="adminId"
+        />
+
+
+        <div class="form-grid">
+
+
+          <label>
+
+            Tanggal
+
+            <input
+              type="date"
+              id="adminEditTanggal"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Kode Produksi
+
+            <input
+              type="text"
+              id="adminEditKode"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Motif
+
+            <input
+              type="text"
+              id="adminEditMotif"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Merek
+
+            <input
+              type="text"
+              id="adminEditMerek"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Seri
+
+            <input
+              type="text"
+              id="adminEditSeri"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Ukuran
+
+            <select
+              id="adminEditUkuran"
+              required
+            >
+
+              <option value="25x50">
+                25 x 50
+              </option>
+
+              <option value="50x50">
+                50 x 50
+              </option>
+
+              <option value="60x60">
+                60 x 60
+              </option>
+
+              <option value="60x120">
+                60 x 120
+              </option>
+
+            </select>
+
+          </label>
+
+
+        </div>
+
+
+        <div class="form-grid three">
+
+
+          <label>
+
+            Total S1
+
+            <input
+              type="number"
+              id="adminEditS1"
+              min="0"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Total S2
+
+            <input
+              type="number"
+              id="adminEditS2"
+              min="0"
+              required
+            />
+
+          </label>
+
+
+          <label>
+
+            Total KW3
+
+            <input
+              type="number"
+              id="adminEditKW3"
+              min="0"
+              required
+            />
+
+          </label>
+
+
+        </div>
+
+
+        <div class="grand-total">
+
+          <span>
+            GRAND TOTAL
+          </span>
+
+          <strong id="adminEditTotal">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            data-close="adminModal"
+          >
+            Batal
+          </button>
+
+          <button
+            class="btn primary"
+          >
+            Simpan Perubahan
+          </button>
+
+        </div>
+
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- LIBRARY -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"
+  ></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
+  ></script>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
